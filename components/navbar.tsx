@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Search, Menu, BookOpen, BarChart3, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ThemeToggle } from "@/components/ui/themeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +37,7 @@ export function Navbar() {
 
   return (
     <nav
-      className="border-b-4 border-foreground bg-white sticky top-0 z-40"
+      className="border-b-4 border-foreground bg-background sticky top-0 z-40"
       style={{ boxShadow: "4px 4px 0px rgba(0,0,0,0.1)" }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -91,9 +92,9 @@ export function Navbar() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
 
-            {/* User Info - Auth handled externally */}
+            {/* Theme Toggle */}
             <div className="flex items-center gap-2">
-              {/* User info could be displayed here if needed */}
+              <ThemeToggle />
             </div>
           </div>
 
@@ -126,7 +127,9 @@ export function Navbar() {
                     <Input placeholder="Search courses..." />
                   </div>
 
-                  {/* Auth handled externally */}
+                  <div className="space-y-2">
+                    <ThemeToggle />
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

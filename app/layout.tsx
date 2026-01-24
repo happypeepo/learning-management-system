@@ -2,6 +2,7 @@ import React from "react"
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { ThemeProvider } from '@/components/ui/themeProvider'
 import { UserProvider } from '@/components/user-provider'
 import './globals.css'
 
@@ -46,12 +47,18 @@ export default async function RootLayout({
   const user = username ? { username, labId, role } : null;
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <UserProvider user={user}>
-          {children}
-        </UserProvider>
-        <Analytics />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <UserProvider user={user}>
+            {children}
+            <Analytics />
+          </UserProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
