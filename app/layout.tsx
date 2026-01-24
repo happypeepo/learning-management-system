@@ -2,6 +2,7 @@ import React from "react"
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { UserProvider } from '@/components/user-provider'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -30,15 +31,26 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Read headers (server-side only)
+  const { headers } = await import('next/headers');
+  const headersList = await headers();
+  const username = headersList.get('x-user-name') || '';
+  const labId = headersList.get('x-lab-id') || '';
+  const role = headersList.get('x-user-role') || '';
+
+  const user = username ? { username, labId, role } : null;
+
   return (
     <html lang="en">
       <body className={`font-sans antialiased`}>
-        {children}
+        <UserProvider user={user}>
+          {children}
+        </UserProvider>
         <Analytics />
       </body>
     </html>

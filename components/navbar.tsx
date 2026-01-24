@@ -91,20 +91,9 @@ export function Navbar() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
 
-            {/* Auth Buttons */}
+            {/* User Info - Auth handled externally */}
             <div className="flex items-center gap-2">
-              <Button
-                className="border-4 border-foreground bg-white text-foreground font-black hover:bg-muted"
-                asChild
-              >
-                <Link href="/auth/login">Sign In</Link>
-              </Button>
-              <Button
-                className="border-4 border-foreground bg-primary text-primary-foreground font-black"
-                asChild
-              >
-                <Link href="/auth/signup">Sign Up</Link>
-              </Button>
+              {/* User info could be displayed here if needed */}
             </div>
           </div>
 
@@ -137,18 +126,7 @@ export function Navbar() {
                     <Input placeholder="Search courses..." />
                   </div>
 
-                  <div className="space-y-2">
-                    <Button
-                      variant="outline"
-                      asChild
-                      className="w-full bg-transparent"
-                    >
-                      <Link href="/auth/login">Sign In</Link>
-                    </Button>
-                    <Button asChild className="w-full">
-                      <Link href="/auth/signup">Sign Up</Link>
-                    </Button>
-                  </div>
+                  {/* Auth handled externally */}
                 </div>
               </SheetContent>
             </Sheet>
