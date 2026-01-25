@@ -5,34 +5,30 @@ interface OverviewStatsProps {
     totalUsers: number
     totalCourses: number
     totalEnrollments: number
-    totalRevenue: number // Mocked for now
+    totalRevenue: number
 }
 
 export function OverviewStats({ totalUsers, totalCourses, totalEnrollments, totalRevenue }: OverviewStatsProps) {
-    const stats = [
+    const stats: { title: string; value: string; icon: any; description?: string }[] = [
         {
             title: 'Total Users',
             value: totalUsers.toLocaleString(),
             icon: Users,
-            description: '+180 from last month',
         },
         {
             title: 'Active Courses',
             value: totalCourses.toLocaleString(),
             icon: BookOpen,
-            description: '+4 new courses',
         },
         {
             title: 'Total Enrollments',
             value: totalEnrollments.toLocaleString(),
             icon: GraduationCap,
-            description: '+12% increase',
         },
         {
             title: 'Total Revenue',
             value: `$${totalRevenue.toLocaleString()}`,
             icon: DollarSign,
-            description: '+24% from last month',
         },
     ]
 
@@ -48,9 +44,11 @@ export function OverviewStats({ totalUsers, totalCourses, totalEnrollments, tota
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-black">{stat.value}</div>
-                        <p className="text-xs font-bold text-muted-foreground">
-                            {stat.description}
-                        </p>
+                        {stat.description && (
+                            <p className="text-xs font-bold text-muted-foreground">
+                                {stat.description}
+                            </p>
+                        )}
                     </CardContent>
                 </Card>
             ))}

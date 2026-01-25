@@ -11,52 +11,39 @@ export async function middleware(request: NextRequest) {
         token = request.cookies.get('auth_token')?.value || null
     }
 
-    const loginUrl = process.env.NEXT_PUBLIC_LOGIN_URL || 'https://external-project.com/login'
+    const loginUrl = process.env.NEXT_PUBLIC_LOGIN_URL || '/auth/login'
 
     // Helper to redirect to login
     const redirectToLogin = () => {
+        // If loginUrl is external, we need a full URL, otherwise relative works
+        if (loginUrl.startsWith('http')) {
+            return NextResponse.redirect(new URL(loginUrl))
+        }
         return NextResponse.redirect(new URL(loginUrl, request.url))
     }
 
     // 2. Verify Token
+    const path = request.nextUrl.pathname
+    const isProtected = path.startsWith('/course-player') || path.startsWith('/admin')
+
     if (!token) {
-        // Determine if the route requires protection
-        // We protect /course-player, /admin, and maybe others?
-        // User asked to protect /course-player and /admin specifically
-        const path = request.nextUrl.pathname
-        if (path.startsWith('/course-player') || path.startsWith('/admin')) {
+        if (isProtected) {
             return redirectToLogin()
         }
-        // For other routes (e.g. landing page), we might allow access without token? 
-        // Or "If the token is missing or invalid, redirect the user back... " implies GLOBAL protection?
-        // "Protect the /course-player and /admin routes." suggests specific protection.
-        // But "If the token is missing or invalid, redirect..." suggests strictness.
-        // Let's assume strictness for protected routes, but MAYBE open for valid public routes?
-        // The prompt says "Redirect the user back... If the token is missing or invalid"
-        // AND "Protect the /course-player and /admin routes".
-        // I'll stick to protecting those specific routes for now to avoid breaking public landing pages if they exist.
-        // Wait, "Refactor any 'User Profile' ... components".
-
-        // Let's check logic:
-        // If token is present, we attempt verify.
-        // If token is MISSING:
-        //    If route is protected -> Redirect.
-        //    Else -> Continue (Guest mode?)
-
-        // "If the token is missing or invalid, redirect the user back ... " 
-        // This sentence usually implies a firewall.
-        // But "Protect the /course-player and /admin routes" implies specificity.
-        // I will treat /course-player and /admin as STRICTLY protected.
-
-        if (path.startsWith('/course-player') || path.startsWith('/admin')) {
-            return redirectToLogin()
-        }
-
         return NextResponse.next()
     }
 
     try {
-        const secret = new TextEncoder().encode(process.env.EXTERNAL_JWT_SECRET)
+        const secretStr = process.env.EXTERNAL_JWT_SECRET
+        if (!secretStr) {
+            console.error('CRITICAL: EXTERNAL_JWT_SECRET is not defined in environment variables.')
+            if (isProtected) {
+                return redirectToLogin()
+            }
+            return NextResponse.next()
+        }
+
+        const secret = new TextEncoder().encode(secretStr)
         const { payload } = await jwtVerify(token, secret)
 
         // 3. Extract Claims
