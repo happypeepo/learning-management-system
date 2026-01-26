@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Search, Menu, BookOpen, BarChart3, Briefcase } from "lucide-react";
+import { Search, Menu, BookOpen, BarChart3, Briefcase, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/themeToggle";
@@ -80,6 +80,15 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* Dashboard Link */}
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 text-foreground/80 font-bold px-3 py-2 rounded-xl h-10 transition-colors hover:bg-muted"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span>Dashboard</span>
+            </Link>
+
             {/* Search Bar */}
             <div className="relative w-64">
               <Input
@@ -125,6 +134,17 @@ export function Navbar() {
                   <div className="space-y-2">
                     <h3 className="font-semibold">Search</h3>
                     <Input placeholder="Search courses..." />
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Navigation</h3>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary text-foreground"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
+                    </Link>
                   </div>
 
                   <div className="space-y-2">

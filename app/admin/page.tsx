@@ -18,8 +18,22 @@ export default async function AdminDashboard() {
         .from('enrollments')
         .select('*', { count: 'exact', head: true })
 
-    // Mock revenue for MVP
+    // Calculate revenue based on enrollments
     const revenue = (enrollmentCount || 0) * 49.99
+
+    // Fetch recent activities (enrollments)
+    const { data: recentActivities } = await supabase
+        .from('enrollments')
+        .select(`
+            id,
+            enrolled_at,
+            users (full_name, email),
+            courses (title)
+        `)
+        .order('enrolled_at', { ascending: false })
+        .limit(5)
+
+    const activities = (recentActivities as any[]) || []
 
     return (
         <div className="space-y-8">
@@ -54,19 +68,28 @@ export default async function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="flex items-center gap-4 border-b-2 border-slate-100 pb-2 last:border-0 last:pb-0">
-                                    <div className="h-9 w-9 rounded-full bg-primary/20 border-2 border-foreground flex items-center justify-center font-bold">
-                                        U{i}
+                            {activities.length > 0 ? (
+                                activities.map((activity) => (
+                                    <div key={activity.id} className="flex items-center gap-4 border-b-2 border-slate-100 pb-2 last:border-0 last:pb-0">
+                                        <div className="h-9 w-9 rounded-full bg-primary/20 border-2 border-foreground flex items-center justify-center font-bold">
+                                            {activity.users?.full_name?.charAt(0) || activity.users?.email?.charAt(0) || 'U'}
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-bold leading-none">
+                                                {activity.users?.full_name || activity.users?.email || 'Anonymous'} enrolled in{' '}
+                                                <span className="text-primary">{activity.courses?.title}</span>
+                                            </p>
+                                            <p className="text-xs text-muted-foreground font-semibold">
+                                                {new Date(activity.enrolled_at).toLocaleDateString()}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="space-y-1">
-                                        <p className="text-sm font-bold leading-none">New User Registered</p>
-                                        <p className="text-xs text-muted-foreground font-semibold">
-                                            Just now
-                                        </p>
-                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-8 text-muted-foreground font-bold">
+                                    No recent activity found.
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </CardContent>
                 </Card>
