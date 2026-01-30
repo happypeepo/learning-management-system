@@ -13,13 +13,13 @@ interface Course {
     title: string
     level: string
     total_students: number
+    categories?: { name: string }
 }
 
 export default function AdminCoursesPage() {
     const supabase = createClient()
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
-    const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null)
 
     useEffect(() => {
         fetchCourses()
@@ -29,7 +29,10 @@ export default function AdminCoursesPage() {
         setLoading(true)
         const { data } = await supabase
             .from('courses')
-            .select('*')
+            .select(`
+                *,
+                categories (name)
+            `)
             .order('created_at', { ascending: false })
 
         if (data) {
@@ -83,19 +86,27 @@ export default function AdminCoursesPage() {
                         <TableHeader className="bg-secondary/50 border-b-4 border-foreground">
                             <TableRow>
                                 <TableHead className="font-black text-foreground">Title</TableHead>
-                                <TableHead className="font-black text-foreground">Level</TableHead>
+                                <TableHead className="font-black text-foreground">Category</TableHead>
                                 <TableHead className="font-black text-foreground">Students</TableHead>
                                 <TableHead className="text-right font-black text-foreground">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {courses.map((course) => (
-                                    <TableRow
-                                        key={course.id}
-                                        className="font-medium border-b-2 border-border/50 last:border-0 hover:bg-muted/50 transition-colors"
-                                    >
-                                        <TableCell className="font-bold">{course.title}</TableCell>
-                                    <TableCell className="font-bold">{course.level}</TableCell>
+                                <TableRow
+                                    key={course.id}
+                                    className="font-medium border-b-2 border-border/50 last:border-0 hover:bg-muted/50 transition-colors"
+                                >
+                                    <TableCell className="font-bold">{course.title}</TableCell>
+                                    <TableCell className="font-bold">
+                                        {course.categories?.name ? (
+                                            <Badge variant="outline" className="border-2 border-foreground">
+                                                {course.categories.name}
+                                            </Badge>
+                                        ) : (
+                                            <span className="text-muted-foreground text-xs italic">Uncategorized</span>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="font-bold">{course.total_students || 0}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">

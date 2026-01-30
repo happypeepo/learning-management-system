@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,14 @@ import { createClient } from '@/lib/supabase/client'
 export default function NewCoursePage() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [categories, setCategories] = useState<{ id: string, name: string }[]>([])
     const supabase = createClient()
+
+    useEffect(() => {
+        supabase.from('categories').select('id, name').order('name').then(({ data }) => {
+            if (data) setCategories(data)
+        })
+    }, [])
 
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -23,7 +30,7 @@ export default function NewCoursePage() {
         const formData = new FormData(event.currentTarget)
         const title = formData.get('title') as string
         const description = formData.get('description') as string
-        const level = formData.get('level') as string
+        const category_id = formData.get('category_id') as string
 
         const { data: { user } } = await supabase.auth.getUser()
 
@@ -36,9 +43,9 @@ export default function NewCoursePage() {
         const { error } = await supabase.from('courses').insert({
             title,
             description,
-            level,
+            category_id: category_id || null, // Allow empty for uncategorized
             instructor_id: user.id,
-            is_published: true, // Default to true for MVP so it shows on homepage
+            is_published: true,
         })
 
         if (error) {
@@ -79,15 +86,16 @@ export default function NewCoursePage() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="level" className="font-bold">Level</Label>
-                    <Select name="level" required defaultValue="Beginner">
+                    <Label htmlFor="category_id" className="font-bold">Category</Label>
+                    <Select name="category_id">
                         <SelectTrigger className="border-2 border-foreground">
-                            <SelectValue placeholder="Select level" />
+                            <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Beginner">Beginner</SelectItem>
-                            <SelectItem value="Intermediate">Intermediate</SelectItem>
-                            <SelectItem value="Advanced">Advanced</SelectItem>
+                            <SelectItem value="">No Category</SelectItem>
+                            {categories.map((c) => (
+                                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
