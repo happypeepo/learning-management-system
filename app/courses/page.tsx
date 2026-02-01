@@ -8,13 +8,25 @@ export const dynamic = 'force-dynamic'
 
 export default async function CoursesPage() {
     const supabase = await createClient()
-    // 2. Build the query
-    const query = supabase
-        .from('courses')
-        .select('*')
-        .eq('is_published', true)
 
-    const { data: courses, error } = await query.order('created_at', { ascending: false })
+    // Load categories
+    const { data: categories } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name')
+
+    // Load courses with category info
+    const { data: courses, error } = await supabase
+        .from('courses')
+        .select(`
+            *,
+            categories (
+                id,
+                name
+            )
+        `)
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
 
     if (error) console.error('Supabase Error:', error)
 
@@ -57,6 +69,14 @@ export default async function CoursesPage() {
 
                                     <div className="flex flex-1 flex-col p-8">
                                         <div className="mb-6">
+                                            {/* Category Badge */}
+                                            {course.categories && (
+                                                <div className="mb-3">
+                                                    <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-black uppercase rounded-full border-2 border-primary">
+                                                        {course.categories.name}
+                                                    </span>
+                                                </div>
+                                            )}
                                             <h3 className="text-2xl font-bold leading-tight mb-2 text-card-foreground line-clamp-1">
                                                 {course.title}
                                             </h3>
