@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Search, Menu, BookOpen, BarChart3, Briefcase, LayoutDashboard } from "lucide-react";
+import { Search, Menu, BookOpen, BarChart3, Briefcase, LayoutDashboard, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/themeToggle";
@@ -45,8 +45,16 @@ export function Navbar() {
               className="flex items-center gap-2 text-foreground/80 font-bold px-3 py-2 rounded-xl h-10 transition-colors hover:bg-muted"
             >
               <LayoutDashboard className="h-4 w-4" />
+              <span>Dashboard</span>
+            </Link>
 
-
+            {/* Courses Link */}
+            <Link
+              href="/courses"
+              className="flex items-center gap-2 text-foreground/80 font-bold px-3 py-2 rounded-xl h-10 transition-colors hover:bg-muted"
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>Courses</span>
             </Link>
 
             {/* Categories Link */}
@@ -54,7 +62,7 @@ export function Navbar() {
               href="/categories"
               className="flex items-center gap-2 text-foreground/80 font-bold px-3 py-2 rounded-xl h-10 transition-colors hover:bg-muted"
             >
-              <BookOpen className="h-4 w-4" />
+              <Grid className="h-4 w-4" />
               <span>Categories</span>
             </Link>
 
@@ -102,10 +110,17 @@ export function Navbar() {
                       Dashboard
                     </Link>
                     <Link
-                      href="/categories"
+                      href="/courses"
                       className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary text-foreground"
                     >
                       <BookOpen className="h-4 w-4" />
+                      Courses
+                    </Link>
+                    <Link
+                      href="/categories"
+                      className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary text-foreground"
+                    >
+                      <Grid className="h-4 w-4" />
                       Categories
                     </Link>
                   </div>

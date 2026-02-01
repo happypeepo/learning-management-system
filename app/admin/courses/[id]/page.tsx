@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Plus, Save, FileQuestion, Edit, Trash2, Loader2, Video } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TopicEditDialog } from '@/components/admin/topic-edit-dialog'
 import { CourseLabsSelector } from '@/components/admin/course-labs-selector'
 
@@ -31,6 +32,7 @@ interface Course {
     title: string
     description: string
     level: string
+    category_id?: string
     topics: Topic[]
 }
 
@@ -80,7 +82,7 @@ export default function AdminCourseEditPage({ params }: { params: Promise<{ id: 
             // Fetch Topics separately
             let topicsData: any[] = []
             let topicsError: any = null
-            
+
             try {
                 console.log('🔍 Fetching topics for course:', courseId)
                 const result = await supabase
@@ -96,14 +98,14 @@ export default function AdminCourseEditPage({ params }: { params: Promise<{ id: 
                     `)
                     .eq('course_id', courseId)
                     .order('order_index')
-                
+
                 console.log('📊 Supabase result - Data:', result.data?.length || 0, 'items')
                 console.log('📊 Supabase result - Error:', result.error ? 'YES' : 'NO')
                 console.log('📊 Supabase result - Status:', result.status)
-                
+
                 topicsData = result.data || []
                 topicsError = result.error
-                
+
                 if (topicsError) {
                     console.log('❌ Topics fetch failed!')
                     console.log('🔍 Error object:', topicsError)
@@ -136,7 +138,7 @@ export default function AdminCourseEditPage({ params }: { params: Promise<{ id: 
         try {
             // Ensure level is not empty - provide default value
             const courseLevel = level || 'Beginner'
-            
+
             const { error } = await supabase
                 .from('courses')
                 .update({
@@ -351,16 +353,31 @@ export default function AdminCourseEditPage({ params }: { params: Promise<{ id: 
 
                             <div className="space-y-2">
                                 <Label className="font-bold">Category</Label>
-                                <select
-                                    className="flex h-10 w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    value={selectedCategoryId}
-                                    onChange={(e) => setSelectedCategoryId(e.target.value)}
-                                >
-                                    <option value="">No Category</option>
-                                    {categories.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
+                                <Select value={selectedCategoryId || "none"} onValueChange={(val) => setSelectedCategoryId(val === "none" ? "" : val)}>
+                                    <SelectTrigger className="border-2 border-border">
+                                        <SelectValue placeholder="Select category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">No Category</SelectItem>
+                                        {categories.map((c) => (
+                                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="font-bold">Difficulty Level</Label>
+                                <Select value={level} onValueChange={setLevel}>
+                                    <SelectTrigger className="border-2 border-border">
+                                        <SelectValue placeholder="Select level" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Beginner">Beginner</SelectItem>
+                                        <SelectItem value="Intermediate">Intermediate</SelectItem>
+                                        <SelectItem value="Advanced">Advanced</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </CardContent>
                     </Card>

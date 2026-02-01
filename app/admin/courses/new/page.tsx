@@ -15,6 +15,8 @@ export default function NewCoursePage() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [categories, setCategories] = useState<{ id: string, name: string }[]>([])
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string>('none')
+    const [level, setLevel] = useState<string>('Beginner')
     const supabase = createClient()
 
     useEffect(() => {
@@ -30,7 +32,7 @@ export default function NewCoursePage() {
         const formData = new FormData(event.currentTarget)
         const title = formData.get('title') as string
         const description = formData.get('description') as string
-        const category_id = formData.get('category_id') === 'none' ? null : formData.get('category_id') as string
+        const category_id = selectedCategoryId === 'none' ? null : selectedCategoryId
 
         // Use API route instead of direct Supabase client to leverage middleware auth
         try {
@@ -42,7 +44,8 @@ export default function NewCoursePage() {
                 body: JSON.stringify({
                     title,
                     description,
-                    category_id
+                    category_id,
+                    level
                 })
             })
 
@@ -91,7 +94,7 @@ export default function NewCoursePage() {
 
                 <div className="space-y-2">
                     <Label htmlFor="category_id" className="font-bold">Category</Label>
-                    <Select name="category_id">
+                    <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
                         <SelectTrigger className="border-2 border-foreground">
                             <SelectValue placeholder="Select category" />
                         </SelectTrigger>
@@ -100,6 +103,20 @@ export default function NewCoursePage() {
                             {categories.map((c) => (
                                 <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                             ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="level" className="font-bold">Difficulty Level</Label>
+                    <Select value={level} onValueChange={setLevel}>
+                        <SelectTrigger className="border-2 border-foreground">
+                            <SelectValue placeholder="Select level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Beginner">Beginner</SelectItem>
+                            <SelectItem value="Intermediate">Intermediate</SelectItem>
+                            <SelectItem value="Advanced">Advanced</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
